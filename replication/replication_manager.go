@@ -29,7 +29,7 @@ type ReplicationManager struct {
 func NewReplicationManager(db *DB) *ReplicationManager {
 	return &ReplicationManager{
 		Nodes: []ReplicaNode{},
-		DB:    db
+		DB:    db,
 	}
 }
 
