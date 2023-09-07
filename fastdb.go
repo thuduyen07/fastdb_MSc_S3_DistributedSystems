@@ -167,6 +167,12 @@ func (fdb *DB) Set(bucket string, key int, value []byte) error {
 	fdb.mu.Lock()
 	defer fdb.mu.Unlock()
 
+	// Calculate the hash of the key
+	hash := crc32.ChecksumIEEE([]byte(strconv.Itoa(key)))
+
+	// Use binary search to find the node to store the data
+	nodeID := fdb.GetNodeId(hash)
+
 	if fdb.aof != nil {
 		lines := "set\n" + bucket + "_" + strconv.Itoa(key) + "\n" + string(value) + "\n"
 
@@ -185,6 +191,42 @@ func (fdb *DB) Set(bucket string, key int, value []byte) error {
 
 	return nil
 }
+
+// GetNodeId calculates the node ID for a given hash value.
+func (fdb *DB) GetNodeId(hash uint32) int {
+    // Sort the nodes by their hash values
+    sort.Slice(fdb.nodes, func(i, j int) bool {
+        return fdb.nodes[i].Hash < fdb.nodes[j].Hash
+    })
+
+    // Perform binary search to find the node with the closest hash
+    left := 0
+    right := len(fdb.nodes) - 1
+
+    for left <= right {
+        mid := (left + right) / 2
+        if fdb.nodes[mid].Hash == hash {
+            return fdb.nodes[mid].ID
+        } else if fdb.nodes[mid].Hash < hash {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+
+    // If no exact match is found, return the ID of the closest node
+    if right < 0 {
+        return fdb.nodes[0].ID
+    } else if left >= len(fdb.nodes) {
+        return fdb.nodes[len(fdb.nodes)-1].ID
+    } else {
+        if hash-fdb.nodes[right].Hash < fdb.nodes[left].Hash-hash {
+            return fdb.nodes[right].ID
+        }
+        return fdb.nodes[left].ID
+    }
+}
+
 
 /*
 Close closes the database.
