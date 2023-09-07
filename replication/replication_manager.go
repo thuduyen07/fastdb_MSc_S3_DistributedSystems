@@ -12,7 +12,6 @@ import (
 	"strings"
 	"time"
 	"github.com/marcelloh/fastdb/persist"
-	"thuduyen07/fastdb_MSc_S3_DistributedSystems/fastdb"
 )
 
 /* ---------------------- Constants/Types/Variables ------------------ */
