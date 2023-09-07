@@ -6,13 +6,13 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"sync"
 	"bufio"
 	"net"
 	"strings"
 	"sync"
 	"time"
 	"github.com/marcelloh/fastdb/persist"
+	"hash/crc32"
 )
 
 // ReplicaNode represents a node for data replication.
@@ -29,7 +29,7 @@ func NewReplicaNode(Id int, Address string, Status string) *ReplicaNode {
 		Id:      Id,
 		Address: Address,
 		Status:  Status,
-		HashId:  crc32.Checksum([]byte(id)),
+		HashId:  crc32.Checksum([]byte(Id)),
 	}
 }
 

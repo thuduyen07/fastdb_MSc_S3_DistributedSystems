@@ -10,7 +10,6 @@ import (
 	"bufio"
 	"net"
 	"strings"
-	"sync"
 	"time"
 	"github.com/marcelloh/fastdb/persist"
 )
